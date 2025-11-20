@@ -1,0 +1,65 @@
+{% extends "auction/base.html" %}
+{% load static %}
+{% block title %} {{ lot.name }} Bid {% endblock %}
+
+{% block content %}
+
+<section class="main mob-mrg-top">
+  {{ lot.id|json_script:"lot_id" }}
+
+  <div class="slideshow fade">
+    {% for img in lot.lotimage_set.all %}
+    <div class="slide">
+      <img src="{{ img.image.url }}" alt="lot-img">
+    </div>
+    {% endfor %}
+
+    <a class="Back" onclick="plusSlides(-1)">&#10094;</a>
+    <a class="forward" onclick="plusSlides(1)">&#10095;</a>
+  </div>
+  <div style="text-align:center">
+    {% for img in lot.lotimage_set.all %}
+    <span class="dots" onclick="currentSlide({{ forloop.counter }})"></span>
+    {% endfor %}
+  </div>
+
+  <h1>{{ lot.name }}</h1>
+  <p class="lot-desc">
+    {{ lot.description }}
+  </p>
+
+  <div class="bids-display">
+    <table>
+      <thead>
+        <tr>
+          <th class="sn">S/N</th>
+          <th>Bidders</th>
+          <th>Bids</th>
+        </tr>
+      </thead>
+      <tbody id="bidders-display-box"></tbody>
+    </table>
+  </div>
+  <button id="bid-btn" class="bid-incrementer">
+    Place Bid +$ {{ lot.increment|floatformat:"-3g" }}
+  </button>
+  <input
+  type="number"
+  placeholder="Enter a larger bid..."
+  id="bid-move-amt" />
+</section>
+
+<script>
+  const origin = window.location.origin;
+  let lotPrice = Number("{{ lot.price }}");
+  const lotIncrementalValue = Number("{{ lot.increment }}");
+  const lot_id = JSON.parse(document.getElementById("lot_id").textContent);
+  const getLotEndtimeUrl = `${origin}/has-expired/{{ lot.id }}/`;
+  const getLotPriceURL = `${origin}/get-lot-price/{{ lot.id }}`;
+  const markAsSoldURL = `${origin}/mark-lot-as-sold/${lot_id}/`
+</script>
+
+<script src="{% static 'js/carousel.js' %}"></script>
+<script src="{% static 'js/utils.js' %}"></script>
+
+{% endblock %}
